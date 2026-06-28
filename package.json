@@ -1,6 +1,7 @@
 {
   "name": "projects",
   "version": "1.0.0",
+  "type": "module",
   "description": "Vanilla TypeScript application with Express + Vite (HTML + CSS + TS + Node API)",
   "scripts": {
     "build": "bash ./scripts/build.sh",
@@ -37,7 +38,7 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "pnpm": ">=9.0.0",
-    "node": "20.x"
+    "node": "24.x"
   },
   "pnpm": {
     "overrides": {
