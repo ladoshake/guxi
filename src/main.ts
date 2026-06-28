@@ -273,20 +273,31 @@ function bindEvents(): void {
 }
 
 async function fetchData(): Promise<void> {
+  console.log('[DEBUG] 开始获取数据...');
   isLoading = true;
   fetchError = null;
   updateUI();
 
   try {
+    console.log('[DEBUG] 发送 API 请求到 /api/dividend/rankings');
     const response = await fetch('/api/dividend/rankings', {
       signal: AbortSignal.timeout(180000),
     });
+    console.log(`[DEBUG] API 响应状态: ${response.status} ${response.statusText}`);
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
     const data: RankingsData = await response.json();
+    console.log('[DEBUG] API 响应数据:', JSON.stringify({
+      success: data.success,
+      total_count: data.total_count,
+      ttm_count: data.ttm_ranking?.length ?? 0,
+      lfy_count: data.lfy_ranking?.length ?? 0,
+      data_time: data.data_time,
+      message: data.message
+    }, null, 2));
 
     if (!data.success) {
       throw new Error(data.message || '数据获取失败');
@@ -294,9 +305,11 @@ async function fetchData(): Promise<void> {
 
     currentData = data;
     isLoading = false;
+    console.log('[DEBUG] 数据加载成功，更新 UI');
     updateUI();
   } catch (err) {
     isLoading = false;
+    console.error('[DEBUG] 数据获取失败:', err);
     if (err instanceof DOMException && err.name === 'TimeoutError') {
       fetchError = '请求超时，数据量较大请稍后重试';
     } else if (err instanceof Error) {

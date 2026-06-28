@@ -137,10 +137,14 @@ async function processBatch(stocks: any[]): Promise<StockItem[]> {
 }
 
 export default async function handler(request: Request): Promise<Response> {
+  console.log('[API] 开始处理请求');
   try {
+    console.log('[API] 步骤1: 获取股票列表');
     const stocks = await fetchStockList();
+    console.log(`[API] 获取到 ${stocks.length} 只股票`);
     
     if (!stocks.length) {
+      console.log('[API] 股票列表为空');
       return Response.json({
         success: false,
         message: '无法获取A股数据',
@@ -153,8 +157,10 @@ export default async function handler(request: Request): Promise<Response> {
     const largeStocks = stocks
       .filter(s => (parseFloat(s.f20) || 0) > MARKET_CAP_THRESHOLD)
       .slice(0, MAX_STOCKS);
+    console.log(`[API] 筛选出 ${largeStocks.length} 只市值大于1000亿的股票`);
 
     if (!largeStocks.length) {
+      console.log('[API] 没有符合条件的股票');
       return Response.json({
         success: true,
         message: '没有市值大于1000亿的公司',
@@ -164,7 +170,9 @@ export default async function handler(request: Request): Promise<Response> {
       });
     }
 
+    console.log('[API] 步骤2: 批量获取股息数据');
     const results = await processBatch(largeStocks);
+    console.log(`[API] 获取到 ${results.length} 只有股息数据的股票`);
 
     const ttmSorted = results
       .filter(r => r.ttm_yield > 0)
@@ -176,6 +184,8 @@ export default async function handler(request: Request): Promise<Response> {
       .sort((a, b) => b.lfy_yield - a.lfy_yield)
       .slice(0, 30);
 
+    console.log(`[API] TTM排名: ${ttmSorted.length} 只, LFY排名: ${lfySorted.length} 只`);
+
     return Response.json({
       success: true,
       ttm_ranking: ttmSorted.map((item, i) => ({ ...item, rank: i + 1 })),
@@ -184,6 +194,7 @@ export default async function handler(request: Request): Promise<Response> {
       data_time: new Date().toLocaleString('zh-CN')
     });
   } catch (error) {
+    console.error('[API] 发生错误:', error);
     return Response.json({
       success: false,
       message: `数据获取失败: ${error instanceof Error ? error.message : '未知错误'}`,
