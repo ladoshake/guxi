@@ -3,7 +3,7 @@
   "outputDirectory": "dist",
   "functions": {
     "api/**/*.{ts,js}": {
-      "runtime": "@vercel/node@3",
+      "runtime": "nodejs20.x",
       "maxDuration": 120
     }
   },
