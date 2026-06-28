@@ -1,12 +1,9 @@
 {
-  "buildCommand": "pip install -r requirements.txt",
+  "buildCommand": "",
   "outputDirectory": ".",
-  "installCommand": "pip install -r requirements.txt",
+  "installCommand": "",
   "framework": null,
   "rewrites": [
-    { "source": "/api/dividend", "destination": "/api/dividend" },
-    { "source": "/api/refresh", "destination": "/api/refresh" },
-    { "source": "/api/status", "destination": "/api/status" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

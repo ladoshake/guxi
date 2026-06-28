@@ -315,57 +315,6 @@
     </div>
     
     <script>
-        const API_BASE = '/api';
-        let pollInterval = null;
-        
-        function startPolling() {
-            if (pollInterval) clearInterval(pollInterval);
-            pollInterval = setInterval(checkDataStatus, 2000);
-        }
-        
-        function stopPolling() {
-            if (pollInterval) {
-                clearInterval(pollInterval);
-                pollInterval = null;
-            }
-        }
-        
-        async function checkDataStatus() {
-            try {
-                const response = await fetch(`${API_BASE}/dividend`);
-                const result = await response.json();
-                
-                // 有数据就立即显示
-                if (result.success) {
-                    if (result.data.ttm.length > 0) {
-                        renderTable('ttmBody', result.data.ttm, 'ttm_yield', 'ttm_dividend', 'ttm_dividend_count');
-                    }
-                    if (result.data.lfy.length > 0) {
-                        renderTable('lfyBody', result.data.lfy, 'lfy_yield', 'lfy_dividend', 'lfy_dividend_count');
-                    }
-                    if (result.data.ttm.length > 0 || result.data.lfy.length > 0) {
-                        document.getElementById('updateTime').textContent = 
-                            `数据更新时间：${result.update_time}`;
-                    }
-                    
-                    // 数据加载完成，停止轮询
-                    if (result.status === 'ready') {
-                        document.getElementById('loadingStatus').textContent = '';
-                        stopPolling();
-                        
-                        const btn = document.getElementById('refreshBtn');
-                        const spinner = btn.querySelector('.btn-spinner');
-                        const btnText = btn.querySelector('.btn-text');
-                        btn.disabled = false;
-                        spinner.style.display = 'none';
-                        btnText.textContent = '刷新数据';
-                    }
-                }
-            } catch (e) {
-                console.error('轮询数据失败:', e);
-            }
-        }
-        
         async function loadData() {
             const btn = document.getElementById('refreshBtn');
             const spinner = btn.querySelector('.btn-spinner');
@@ -380,30 +329,26 @@
             document.getElementById('loadingStatus').textContent = '数据正在加载中，请稍候...';
             
             try {
-                const response = await fetch(`${API_BASE}/dividend`);
-                const result = await response.json();
+                const response = await fetch('/data.json');
+                const data = await response.json();
                 
-                if (result.success) {
-                    if (result.data.ttm.length > 0) {
-                        renderTable('ttmBody', result.data.ttm, 'ttm_yield', 'ttm_dividend', 'ttm_dividend_count');
-                    }
-                    if (result.data.lfy.length > 0) {
-                        renderTable('lfyBody', result.data.lfy, 'lfy_yield', 'lfy_dividend', 'lfy_dividend_count');
-                    }
-                    if (result.data.ttm.length > 0 || result.data.lfy.length > 0) {
-                        document.getElementById('updateTime').textContent = 
-                            `数据更新时间：${result.update_time}`;
-                    }
-                    
-                    document.getElementById('loadingStatus').textContent = '';
-                    btn.disabled = false;
-                    spinner.style.display = 'none';
-                    btnText.textContent = '刷新数据';
-                } else {
-                    showError(result.message || '数据加载失败');
+                if (data.ttm && data.ttm.length > 0) {
+                    renderTable('ttmBody', data.ttm, 'ttm_yield', 'ttm_dividend', 'ttm_dividend_count');
                 }
+                if (data.lfy && data.lfy.length > 0) {
+                    renderTable('lfyBody', data.lfy, 'lfy_yield', 'lfy_dividend', 'lfy_dividend_count');
+                }
+                if (data.ttm && data.ttm.length > 0 || data.lfy && data.lfy.length > 0) {
+                    document.getElementById('updateTime').textContent = 
+                        `数据更新时间：${data.update_time}`;
+                }
+                
+                document.getElementById('loadingStatus').textContent = '';
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.textContent = '刷新数据';
             } catch (e) {
-                showError('无法连接到服务器，请确保后端服务已启动');
+                showError('数据加载失败，请稍后重试');
             }
         }
         
@@ -435,7 +380,6 @@
             document.getElementById('lfyBody').innerHTML = 
                 `<tr><td colspan="8" class="error">${message}</td></tr>`;
             document.getElementById('loadingStatus').textContent = '';
-            stopPolling();
             
             const btn = document.getElementById('refreshBtn');
             const spinner = btn.querySelector('.btn-spinner');
