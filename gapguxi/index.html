@@ -24,8 +24,19 @@
         }
         
         header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
             margin-bottom: 30px;
+        }
+        
+        .header-left {
+            text-align: left;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: flex-start;
         }
         
         h1 {
@@ -47,7 +58,7 @@
         
         .controls {
             display: flex;
-            justify-content: center;
+            justify-content: flex-end;
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -130,6 +141,11 @@
             border-bottom: 1px solid #eee;
         }
         
+        th:nth-child(3),
+        td:nth-child(3) {
+            min-width: 100px;
+        }
+        
         td {
             padding: 12px 15px;
             border-bottom: 1px solid #f5f5f5;
@@ -203,27 +219,40 @@
             font-size: 12px;
             margin-top: 5px;
         }
+        
+        .btn-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .btn.loading .btn-spinner {
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>A股高股息率排行榜</h1>
-            <p class="subtitle">市值大于1000亿人民币 | 股息率排名前30</p>
-            <p class="update-time" id="updateTime">数据更新时间：--</p>
-            <p class="loading-status" id="loadingStatus"></p>
+            <div class="header-left">
+                <h1>A股高股息率排行榜</h1>
+                <p class="subtitle">市值大于1000亿人民币 | 股息率排名前30</p>
+                <p class="update-time" id="updateTime">数据更新时间：--</p>
+                <p class="loading-status" id="loadingStatus"></p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-primary" id="refreshBtn" onclick="loadData()">
+                    <span class="btn-spinner" style="display: none;"></span>
+                    <span class="btn-text">刷新数据</span>
+                </button>
+            </div>
         </header>
-        
-        <div class="controls">
-            <button class="btn btn-primary" id="refreshBtn" onclick="loadData()">
-                刷新数据
-            </button>
-        </div>
-        
-        <div class="info-box">
-            <strong>说明：</strong>股息率根据实际分红金额计算，不使用f183等第三方数据。
-            TTM股息率使用最近12个月分红总和，LFY股息率使用最近一个财年分红数据。
-        </div>
         
         <div class="tables-container">
             <div class="table-card">
@@ -278,6 +307,11 @@
                 </div>
             </div>
         </div>
+        
+        <div class="info-box" style="margin-top: 25px; margin-bottom: 0;">
+            <strong>说明：</strong>股息率根据实际分红金额计算，不使用f183等第三方数据。
+            TTM股息率使用最近12个月分红总和，LFY股息率使用最近一个财年分红数据。
+        </div>
     </div>
     
     <script>
@@ -315,13 +349,16 @@
                     }
                     
                     // 数据加载完成，停止轮询
-                    if (result.status === 'ready' && result.data.ttm.length >= 30 && result.data.lfy.length >= 30) {
+                    if (result.status === 'ready') {
                         document.getElementById('loadingStatus').textContent = '';
                         stopPolling();
                         
                         const btn = document.getElementById('refreshBtn');
+                        const spinner = btn.querySelector('.btn-spinner');
+                        const btnText = btn.querySelector('.btn-text');
                         btn.disabled = false;
-                        btn.textContent = '刷新数据';
+                        spinner.style.display = 'none';
+                        btnText.textContent = '刷新数据';
                     }
                 }
             } catch (e) {
@@ -331,18 +368,22 @@
         
         async function loadData() {
             const btn = document.getElementById('refreshBtn');
+            const spinner = btn.querySelector('.btn-spinner');
+            const btnText = btn.querySelector('.btn-text');
+            
             btn.disabled = true;
-            btn.textContent = '加载中...';
+            spinner.style.display = 'inline-block';
+            btnText.textContent = '加载中...';
             
             document.getElementById('ttmBody').innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
             document.getElementById('lfyBody').innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
+            document.getElementById('loadingStatus').textContent = '数据正在加载中，请稍候...';
             
             try {
                 const response = await fetch(`${API_BASE}/dividend`);
                 const result = await response.json();
                 
                 if (result.success) {
-                    // 有数据就立即显示
                     if (result.data.ttm.length > 0) {
                         renderTable('ttmBody', result.data.ttm, 'ttm_yield', 'ttm_dividend', 'ttm_dividend_count');
                     }
@@ -354,16 +395,10 @@
                             `数据更新时间：${result.update_time}`;
                     }
                     
-                    // 数据还在加载中，开始轮询
-                    if (result.status === 'updating' || result.data.ttm.length < 30 || result.data.lfy.length < 30) {
-                        document.getElementById('loadingStatus').textContent = 
-                            '数据正在实时加载中，请稍等...';
-                        startPolling();
-                    } else {
-                        document.getElementById('loadingStatus').textContent = '';
-                        btn.disabled = false;
-                        btn.textContent = '刷新数据';
-                    }
+                    document.getElementById('loadingStatus').textContent = '';
+                    btn.disabled = false;
+                    spinner.style.display = 'none';
+                    btnText.textContent = '刷新数据';
                 } else {
                     showError(result.message || '数据加载失败');
                 }
@@ -386,7 +421,7 @@
                     <td>${item.code}</td>
                     <td>${item.name}</td>
                     <td>${item.price.toFixed(2)}</td>
-                    <td>${item.market_cap.toFixed(2)}</td>
+                    <td>${Math.round(item.market_cap)}</td>
                     <td>${item[dividendField].toFixed(4)}</td>
                     <td>${item[countField] || 0}</td>
                     <td class="yield-rate">${item[yieldField].toFixed(2)}</td>
@@ -403,8 +438,11 @@
             stopPolling();
             
             const btn = document.getElementById('refreshBtn');
+            const spinner = btn.querySelector('.btn-spinner');
+            const btnText = btn.querySelector('.btn-text');
             btn.disabled = false;
-            btn.textContent = '刷新数据';
+            spinner.style.display = 'none';
+            btnText.textContent = '刷新数据';
         }
         
         loadData();
