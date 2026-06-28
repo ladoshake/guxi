@@ -1,25 +1,19 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from mangum import Mangum
 import akshare as ak
 import pandas as pd
 import re
 from datetime import datetime, timedelta
 import logging
-import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# 全局缓存（在serverless环境中可能不持久）
+cached_data = {
+    'ttm': [],
+    'lfy': [],
+    'update_time': None,
+    'status': 'ready'
+}
 
 
 def parse_dividend_per_share(description):
@@ -123,13 +117,6 @@ def calculate_lfy_dividend(dividend_df):
     return 0.0, 0
 
 
-cached_data = {
-    'ttm': [],
-    'lfy': [],
-    'update_time': None
-}
-
-
 def get_stock_data():
     """获取A股数据并计算股息率"""
     global cached_data
@@ -216,39 +203,3 @@ def get_stock_data():
     cached_data['update_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     logger.info(f"完成！TTM前30: {len(results_ttm)}, LFY前30: {len(results_lfy)}")
-
-
-@app.get("/api/dividend")
-async def get_dividend_data():
-    """获取股息率数据API"""
-    global cached_data
-    
-    if not cached_data['ttm'] or not cached_data['lfy']:
-        get_stock_data()
-    
-    return {
-        "success": True,
-        "status": "ready",
-        "data": {
-            "ttm": cached_data['ttm'],
-            "lfy": cached_data['lfy']
-        },
-        "update_time": cached_data['update_time']
-    }
-
-
-@app.get("/api/refresh")
-async def refresh_data():
-    """手动刷新数据"""
-    global cached_data
-    cached_data['ttm'] = []
-    cached_data['lfy'] = []
-    get_stock_data()
-    
-    return {
-        "success": True,
-        "message": "数据刷新完成"
-    }
-
-
-handler = Mangum(app)
