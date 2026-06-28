@@ -1,13 +1,413 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A股股息率排名 - 市值千亿以上公司股息率排行榜" />
-    <title>A股股息率排名</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/index.ts"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A股高股息率排行榜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #1a1a2e;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .update-time {
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .tables-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 1000px) {
+            .tables-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .table-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #1890ff, #096dd9);
+            color: white;
+            padding: 18px 20px;
+        }
+        
+        .table-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .table-header p {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #fafafa;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .rank {
+            font-weight: 600;
+            color: #1890ff;
+        }
+        
+        .yield-rate {
+            font-weight: 600;
+            color: #fa541c;
+        }
+        
+        .yield-rate::after {
+            content: "%";
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loading::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #1890ff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #f5222d;
+        }
+        
+        .info-box {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .info-box strong {
+            color: #1890ff;
+        }
+        
+        .loading-status {
+            color: #1890ff;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>A股高股息率排行榜</h1>
+            <p class="subtitle">市值大于1000亿人民币 | 股息率排名前30</p>
+            <p class="update-time" id="updateTime">数据更新时间：--</p>
+            <p class="loading-status" id="loadingStatus"></p>
+        </header>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="refreshBtn" onclick="loadData()">
+                刷新数据
+            </button>
+        </div>
+        
+        <div class="info-box">
+            <strong>说明：</strong>股息率根据实际分红金额计算，不使用f183等第三方数据。
+            TTM股息率使用最近12个月分红总和，LFY股息率使用最近一个财年分红数据。
+        </div>
+        
+        <div class="tables-container">
+            <div class="table-card">
+                <div class="table-header">
+                    <h2>TTM股息率 TOP 30</h2>
+                    <p>最近12个月股息率排名</p>
+                </div>
+                <div class="table-wrapper">
+                    <table id="ttmTable">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>代码</th>
+                                <th>名称</th>
+                                <th>最新价</th>
+                                <th>市值(亿)</th>
+                                <th>TTM每股分红</th>
+                                <th>分红次数</th>
+                                <th>TTM股息率(%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ttmBody">
+                            <tr><td colspan="8" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="table-card">
+                <div class="table-header">
+                    <h2>LFY股息率 TOP 30</h2>
+                    <p>最近一个财年股息率排名</p>
+                </div>
+                <div class="table-wrapper">
+                    <table id="lfyTable">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>代码</th>
+                                <th>名称</th>
+                                <th>最新价</th>
+                                <th>市值(亿)</th>
+                                <th>LFY每股分红</th>
+                                <th>分红次数</th>
+                                <th>LFY股息率(%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lfyBody">
+                            <tr><td colspan="8" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        let pollInterval = null;
+        
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(checkDataStatus, 2000);
+        }
+        
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+        
+        async function checkDataStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/dividend`);
+                const result = await response.json();
+                
+                // 有数据就立即显示
+                if (result.success) {
+                    if (result.data.ttm.length > 0) {
+                        renderTable('ttmBody', result.data.ttm, 'ttm_yield', 'ttm_dividend', 'ttm_dividend_count');
+                    }
+                    if (result.data.lfy.length > 0) {
+                        renderTable('lfyBody', result.data.lfy, 'lfy_yield', 'lfy_dividend', 'lfy_dividend_count');
+                    }
+                    if (result.data.ttm.length > 0 || result.data.lfy.length > 0) {
+                        document.getElementById('updateTime').textContent = 
+                            `数据更新时间：${result.update_time}`;
+                    }
+                    
+                    // 数据加载完成，停止轮询
+                    if (result.status === 'ready' && result.data.ttm.length >= 30 && result.data.lfy.length >= 30) {
+                        document.getElementById('loadingStatus').textContent = '';
+                        stopPolling();
+                        
+                        const btn = document.getElementById('refreshBtn');
+                        btn.disabled = false;
+                        btn.textContent = '刷新数据';
+                    }
+                }
+            } catch (e) {
+                console.error('轮询数据失败:', e);
+            }
+        }
+        
+        async function loadData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            btn.textContent = '加载中...';
+            
+            document.getElementById('ttmBody').innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
+            document.getElementById('lfyBody').innerHTML = '<tr><td colspan="8" class="loading">加载中...</td></tr>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/dividend`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 有数据就立即显示
+                    if (result.data.ttm.length > 0) {
+                        renderTable('ttmBody', result.data.ttm, 'ttm_yield', 'ttm_dividend', 'ttm_dividend_count');
+                    }
+                    if (result.data.lfy.length > 0) {
+                        renderTable('lfyBody', result.data.lfy, 'lfy_yield', 'lfy_dividend', 'lfy_dividend_count');
+                    }
+                    if (result.data.ttm.length > 0 || result.data.lfy.length > 0) {
+                        document.getElementById('updateTime').textContent = 
+                            `数据更新时间：${result.update_time}`;
+                    }
+                    
+                    // 数据还在加载中，开始轮询
+                    if (result.status === 'updating' || result.data.ttm.length < 30 || result.data.lfy.length < 30) {
+                        document.getElementById('loadingStatus').textContent = 
+                            '数据正在实时加载中，请稍等...';
+                        startPolling();
+                    } else {
+                        document.getElementById('loadingStatus').textContent = '';
+                        btn.disabled = false;
+                        btn.textContent = '刷新数据';
+                    }
+                } else {
+                    showError(result.message || '数据加载失败');
+                }
+            } catch (e) {
+                showError('无法连接到服务器，请确保后端服务已启动');
+            }
+        }
+        
+        function renderTable(tbodyId, data, yieldField, dividendField, countField) {
+            const tbody = document.getElementById(tbodyId);
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="loading">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map((item, index) => `
+                <tr>
+                    <td class="rank">${index + 1}</td>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td>${item.market_cap.toFixed(2)}</td>
+                    <td>${item[dividendField].toFixed(4)}</td>
+                    <td>${item[countField] || 0}</td>
+                    <td class="yield-rate">${item[yieldField].toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function showError(message) {
+            document.getElementById('ttmBody').innerHTML = 
+                `<tr><td colspan="8" class="error">${message}</td></tr>`;
+            document.getElementById('lfyBody').innerHTML = 
+                `<tr><td colspan="8" class="error">${message}</td></tr>`;
+            document.getElementById('loadingStatus').textContent = '';
+            stopPolling();
+            
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = false;
+            btn.textContent = '刷新数据';
+        }
+        
+        loadData();
+    </script>
+</body>
 </html>
