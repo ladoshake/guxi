@@ -1,0 +1,20 @@
+{
+  "buildCommand": "pnpm vite build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/**/*.{ts,js}": {
+      "runtime": "@vercel/node@3",
+      "maxDuration": 120
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

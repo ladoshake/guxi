@@ -120,6 +120,14 @@ function renderSkeleton(): string {
     .join('');
 
   return `
+    <div class="loading-banner">
+      <svg class="loading-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" stroke-width="2" stroke-dasharray="60" stroke-dashoffset="20">
+          <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+      <span>正在刷新数据，请稍后...</span>
+    </div>
     <div class="table-wrapper">
       <table class="data-table">
         <thead>

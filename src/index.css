@@ -301,6 +301,27 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Loading Banner */
+.loading-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: rgba(212, 168, 83, 0.08);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--accent-gold);
+  font-weight: 500;
+}
+
+.loading-spinner {
+  flex-shrink: 0;
+  color: var(--accent-gold);
+}
+
 /* Skeleton Loading */
 .skeleton-line {
   height: 14px;
