@@ -70,6 +70,20 @@
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s;
+            min-width: 100px;
+        }
+
+        @media (max-width: 600px) {
+            .btn {
+                padding: 12px 20px;
+                font-size: 16px;
+                width: 100%;
+                min-width: unset;
+            }
+
+            .controls {
+                justify-content: center;
+            }
         }
         
         .btn-primary {
