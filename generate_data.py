@@ -254,7 +254,7 @@ def get_stock_data():
     return {
         'ttm': results_ttm,
         'lfy': results_lfy,
-        'update_time': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        'update_time': (datetime.now() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
     }
 
 
