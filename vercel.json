@@ -4,6 +4,7 @@
   "installCommand": "",
   "framework": null,
   "rewrites": [
+    { "source": "/data.json", "destination": "/data.json" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
