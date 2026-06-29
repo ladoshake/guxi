@@ -64,13 +64,13 @@
         }
         
         .btn {
-            padding: 10px 25px;
+            padding: 10px 20px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s;
-            min-width: 100px;
+            min-width: 80px;
         }
 
         @media (max-width: 600px) {
@@ -281,11 +281,11 @@
                                 <th>排名</th>
                                 <th>代码</th>
                                 <th>名称</th>
+                                <th>TTM股息率(%)</th>
                                 <th>最新价</th>
                                 <th>市值(亿)</th>
                                 <th>TTM每股分红</th>
                                 <th>分红次数</th>
-                                <th>TTM股息率(%)</th>
                             </tr>
                         </thead>
                         <tbody id="ttmBody">
@@ -307,11 +307,11 @@
                                 <th>排名</th>
                                 <th>代码</th>
                                 <th>名称</th>
+                                <th>LFY股息率(%)</th>
                                 <th>最新价</th>
                                 <th>市值(亿)</th>
                                 <th>LFY每股分红</th>
                                 <th>分红次数</th>
-                                <th>LFY股息率(%)</th>
                             </tr>
                         </thead>
                         <tbody id="lfyBody">
@@ -379,11 +379,11 @@
                     <td class="rank">${index + 1}</td>
                     <td>${item.code}</td>
                     <td>${item.name}</td>
+                    <td class="yield-rate">${item[yieldField].toFixed(2)}</td>
                     <td>${item.price.toFixed(2)}</td>
                     <td>${Math.round(item.market_cap)}</td>
                     <td>${item[dividendField].toFixed(4)}</td>
                     <td>${item[countField] || 0}</td>
-                    <td class="yield-rate">${item[yieldField].toFixed(2)}</td>
                 </tr>
             `).join('');
         }
