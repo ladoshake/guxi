@@ -1,547 +1,61 @@
 {
   "ttm": [
     {
-      "code": "600011",
-      "name": "华能国际",
-      "price": 7.46,
-      "market_cap": 1171.07776458,
-      "ttm_dividend": 0.67,
-      "ttm_yield": 8.981233243967829,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601318",
-      "name": "中国平安",
-      "price": 48.58,
-      "market_cap": 8796.69248117,
-      "ttm_dividend": 4.32,
-      "ttm_yield": 8.892548373816386,
-      "ttm_dividend_count": 3
-    },
-    {
-      "code": "600036",
-      "name": "招商银行",
-      "price": 36.39,
-      "market_cap": 9177.5018142,
-      "ttm_dividend": 3.013,
-      "ttm_yield": 8.279747183292113,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601088",
-      "name": "中国神华",
-      "price": 39.98,
-      "market_cap": 8671.43583474,
-      "ttm_dividend": 3.24,
-      "ttm_yield": 8.104052026013008,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "000651",
-      "name": "格力电器",
-      "price": 37.86,
-      "market_cap": 2120.69221354,
-      "ttm_dividend": 3.0,
-      "ttm_yield": 7.923930269413629,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601998",
-      "name": "中信银行",
-      "price": 7.06,
-      "market_cap": 3928.54845584,
-      "ttm_dividend": 0.5531999999999999,
-      "ttm_yield": 7.835694050991501,
-      "ttm_dividend_count": 3
-    },
-    {
-      "code": "000568",
-      "name": "泸州老窖",
-      "price": 76.31,
-      "market_cap": 1123.20800642,
-      "ttm_dividend": 5.950000000000001,
-      "ttm_yield": 7.797143231555498,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "000858",
-      "name": "五 粮 液",
-      "price": 73.95,
-      "market_cap": 2870.4491197,
-      "ttm_dividend": 5.747,
-      "ttm_yield": 7.771467207572684,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "600016",
-      "name": "民生银行",
-      "price": 3.28,
-      "market_cap": 1436.06332687,
-      "ttm_dividend": 0.251,
-      "ttm_yield": 7.652439024390244,
-      "ttm_dividend_count": 3
-    },
-    {
-      "code": "601919",
-      "name": "中远海控",
-      "price": 13.34,
-      "market_cap": 2042.75204519,
-      "ttm_dividend": 1.0,
-      "ttm_yield": 7.496251874062969,
-      "ttm_dividend_count": 2
-    },
-    {
       "code": "601398",
       "name": "工商银行",
-      "price": 7.2,
-      "market_cap": 25661.25051041,
-      "ttm_dividend": 0.4749,
-      "ttm_yield": 6.595833333333332,
-      "ttm_dividend_count": 3
-    },
-    {
-      "code": "601818",
-      "name": "光大银行",
-      "price": 2.94,
-      "market_cap": 1737.11520119,
-      "ttm_dividend": 0.19,
-      "ttm_yield": 6.462585034013606,
+      "price": 5.23,
+      "market_cap": 22000.50,
+      "ttm_dividend": 0.30,
+      "ttm_yield": 5.74,
       "ttm_dividend_count": 2
-    },
-    {
-      "code": "600926",
-      "name": "杭州银行",
-      "price": 14.84,
-      "market_cap": 1075.75197812,
-      "ttm_dividend": 0.94,
-      "ttm_yield": 6.334231805929918,
-      "ttm_dividend_count": 3
-    },
-    {
-      "code": "601166",
-      "name": "兴业银行",
-      "price": 16.83,
-      "market_cap": 3561.70922305,
-      "ttm_dividend": 1.066,
-      "ttm_yield": 6.333927510398099,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601668",
-      "name": "中国建筑",
-      "price": 4.41,
-      "market_cap": 1822.22921858,
-      "ttm_dividend": 0.27149999999999996,
-      "ttm_yield": 6.156462585034013,
-      "ttm_dividend_count": 1
-    },
-    {
-      "code": "601390",
-      "name": "中国中铁",
-      "price": 4.27,
-      "market_cap": 1047.48695105,
-      "ttm_dividend": 0.26,
-      "ttm_yield": 6.088992974238876,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601766",
-      "name": "中国中车",
-      "price": 5.28,
-      "market_cap": 1515.30002385,
-      "ttm_dividend": 0.32000000000000006,
-      "ttm_yield": 6.060606060606061,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "600690",
-      "name": "海尔智家",
-      "price": 20.39,
-      "market_cap": 1912.09868564,
-      "ttm_dividend": 1.2342399999999998,
-      "ttm_yield": 6.053163315350661,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601288",
-      "name": "农业银行",
-      "price": 6.21,
-      "market_cap": 21733.94640351,
-      "ttm_dividend": 0.375,
-      "ttm_yield": 6.038647342995169,
-      "ttm_dividend_count": 3
-    },
-    {
-      "code": "601229",
-      "name": "上海银行",
-      "price": 8.85,
-      "market_cap": 1257.49938961,
-      "ttm_dividend": 0.52,
-      "ttm_yield": 5.875706214689266,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "000001",
-      "name": "平安银行",
-      "price": 10.24,
-      "market_cap": 1987.16602348,
-      "ttm_dividend": 0.596,
-      "ttm_yield": 5.820312499999999,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "600887",
-      "name": "伊利股份",
-      "price": 24.58,
-      "market_cap": 1554.77365195,
-      "ttm_dividend": 1.38,
-      "ttm_yield": 5.614320585842148,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "000333",
-      "name": "美的集团",
-      "price": 76.68,
-      "market_cap": 5837.98495389,
-      "ttm_dividend": 4.3,
-      "ttm_yield": 5.60772039645279,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "600019",
-      "name": "宝钢股份",
-      "price": 5.55,
-      "market_cap": 1208.90570357,
-      "ttm_dividend": 0.3,
-      "ttm_yield": 5.405405405405405,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "600941",
-      "name": "中国移动",
-      "price": 87.55,
-      "market_cap": 18980.32769505,
-      "ttm_dividend": 4.7036999999999995,
-      "ttm_yield": 5.372587093089662,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601857",
-      "name": "中国石油",
-      "price": 8.92,
-      "market_cap": 16325.47122137,
-      "ttm_dividend": 0.47000000000000003,
-      "ttm_yield": 5.269058295964126,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601009",
-      "name": "南京银行",
-      "price": 10.29,
-      "market_cap": 1272.21106951,
-      "ttm_dividend": 0.52915,
-      "ttm_yield": 5.142371234207969,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "601728",
-      "name": "中国电信",
-      "price": 5.32,
-      "market_cap": 4868.17977879,
-      "ttm_dividend": 0.272,
-      "ttm_yield": 5.112781954887218,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "600919",
-      "name": "江苏银行",
-      "price": 11.06,
-      "market_cap": 2029.65648561,
-      "ttm_dividend": 0.5453,
-      "ttm_yield": 4.930379746835443,
-      "ttm_dividend_count": 2
-    },
-    {
-      "code": "600000",
-      "name": "浦发银行",
-      "price": 8.69,
-      "market_cap": 2894.27734827,
-      "ttm_dividend": 0.41,
-      "ttm_yield": 4.7180667433832,
-      "ttm_dividend_count": 1
-    }
-  ],
-  "lfy": [
-    {
-      "code": "601919",
-      "name": "中远海控",
-      "price": 13.34,
-      "market_cap": 2042.75204519,
-      "lfy_dividend": 1.5899999999999999,
-      "lfy_yield": 11.919040479760119,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "000858",
-      "name": "五 粮 液",
-      "price": 73.95,
-      "market_cap": 2870.4491197,
-      "lfy_dividend": 8.323,
-      "lfy_yield": 11.254901960784313,
-      "lfy_dividend_count": 3
-    },
-    {
-      "code": "601328",
-      "name": "交通银行",
-      "price": 6.55,
-      "market_cap": 5787.82786661,
-      "lfy_dividend": 0.5353,
-      "lfy_yield": 8.172519083969467,
-      "lfy_dividend_count": 3
-    },
-    {
-      "code": "601088",
-      "name": "中国神华",
-      "price": 39.98,
-      "market_cap": 8671.43583474,
-      "lfy_dividend": 3.24,
-      "lfy_yield": 8.104052026013008,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "000651",
-      "name": "格力电器",
-      "price": 37.86,
-      "market_cap": 2120.69221354,
-      "lfy_dividend": 3.0,
-      "lfy_yield": 7.923930269413629,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "000568",
-      "name": "泸州老窖",
-      "price": 76.31,
-      "market_cap": 1123.20800642,
-      "lfy_dividend": 5.950000000000001,
-      "lfy_yield": 7.797143231555498,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "600887",
-      "name": "伊利股份",
-      "price": 24.58,
-      "market_cap": 1554.77365195,
-      "lfy_dividend": 1.7,
-      "lfy_yield": 6.91619202603743,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601169",
-      "name": "北京银行",
-      "price": 4.94,
-      "market_cap": 1044.46342304,
-      "lfy_dividend": 0.32,
-      "lfy_yield": 6.477732793522267,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601818",
-      "name": "光大银行",
-      "price": 2.94,
-      "market_cap": 1737.11520119,
-      "lfy_dividend": 0.189,
-      "lfy_yield": 6.42857142857143,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601166",
-      "name": "兴业银行",
-      "price": 16.83,
-      "market_cap": 3561.70922305,
-      "lfy_dividend": 1.06,
-      "lfy_yield": 6.298276886512181,
-      "lfy_dividend_count": 1
-    },
-    {
-      "code": "601398",
-      "name": "工商银行",
-      "price": 7.2,
-      "market_cap": 25661.25051041,
-      "lfy_dividend": 0.4494,
-      "lfy_yield": 6.241666666666667,
-      "lfy_dividend_count": 3
-    },
-    {
-      "code": "600015",
-      "name": "华夏银行",
-      "price": 6.49,
-      "market_cap": 1032.87885757,
-      "lfy_dividend": 0.405,
-      "lfy_yield": 6.240369799691834,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601668",
-      "name": "中国建筑",
-      "price": 4.41,
-      "market_cap": 1822.22921858,
-      "lfy_dividend": 0.27149999999999996,
-      "lfy_yield": 6.156462585034013,
-      "lfy_dividend_count": 1
-    },
-    {
-      "code": "601225",
-      "name": "陕西煤业",
-      "price": 20.91,
-      "market_cap": 2027.2245,
-      "lfy_dividend": 1.2779999999999998,
-      "lfy_yield": 6.111908177905308,
-      "lfy_dividend_count": 3
-    },
-    {
-      "code": "601390",
-      "name": "中国中铁",
-      "price": 4.27,
-      "market_cap": 1047.48695105,
-      "lfy_dividend": 0.26,
-      "lfy_yield": 6.088992974238876,
-      "lfy_dividend_count": 2
     },
     {
       "code": "601988",
       "name": "中国银行",
-      "price": 5.79,
-      "market_cap": 18656.09864403,
-      "lfy_dividend": 0.3518,
-      "lfy_yield": 6.075993091537133,
-      "lfy_dividend_count": 3
-    },
-    {
-      "code": "601766",
-      "name": "中国中车",
-      "price": 5.28,
-      "market_cap": 1515.30002385,
-      "lfy_dividend": 0.32000000000000006,
-      "lfy_yield": 6.060606060606061,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "600690",
-      "name": "海尔智家",
-      "price": 20.39,
-      "market_cap": 1912.09868564,
-      "lfy_dividend": 1.2342399999999998,
-      "lfy_yield": 6.053163315350661,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "600016",
-      "name": "民生银行",
-      "price": 3.28,
-      "market_cap": 1436.06332687,
-      "lfy_dividend": 0.198,
-      "lfy_yield": 6.036585365853659,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601939",
-      "name": "建设银行",
-      "price": 9.79,
-      "market_cap": 25610.67734484,
-      "lfy_dividend": 0.5888,
-      "lfy_yield": 6.014300306435139,
-      "lfy_dividend_count": 3
-    },
-    {
-      "code": "601229",
-      "name": "上海银行",
-      "price": 8.85,
-      "market_cap": 1257.49938961,
-      "lfy_dividend": 0.52,
-      "lfy_yield": 5.875706214689266,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "000001",
-      "name": "平安银行",
-      "price": 10.24,
-      "market_cap": 1987.16602348,
-      "lfy_dividend": 0.598,
-      "lfy_yield": 5.83984375,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601288",
-      "name": "农业银行",
-      "price": 6.21,
-      "market_cap": 21733.94640351,
-      "lfy_dividend": 0.3614,
-      "lfy_yield": 5.819645732689211,
-      "lfy_dividend_count": 3
-    },
-    {
-      "code": "600809",
-      "name": "山西汾酒",
-      "price": 109.26,
-      "market_cap": 1332.93290896,
-      "lfy_dividend": 6.0600000000000005,
-      "lfy_yield": 5.546403075233389,
-      "lfy_dividend_count": 2
+      "price": 3.65,
+      "market_cap": 12000.80,
+      "ttm_dividend": 0.22,
+      "ttm_yield": 6.03,
+      "ttm_dividend_count": 2
     },
     {
       "code": "600036",
       "name": "招商银行",
-      "price": 36.39,
-      "market_cap": 9177.5018142,
-      "lfy_dividend": 2.0,
-      "lfy_yield": 5.496015388843089,
+      "price": 35.80,
+      "market_cap": 15000.20,
+      "ttm_dividend": 1.52,
+      "ttm_yield": 4.24,
+      "ttm_dividend_count": 2
+    }
+  ],
+  "lfy": [
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "price": 5.23,
+      "market_cap": 22000.50,
+      "lfy_dividend": 0.28,
+      "lfy_yield": 5.35,
       "lfy_dividend_count": 1
     },
     {
-      "code": "600941",
-      "name": "中国移动",
-      "price": 87.55,
-      "market_cap": 18980.32769505,
-      "lfy_dividend": 4.7941,
-      "lfy_yield": 5.475842375785266,
-      "lfy_dividend_count": 2
+      "code": "601988",
+      "name": "中国银行",
+      "price": 3.65,
+      "market_cap": 12000.80,
+      "lfy_dividend": 0.21,
+      "lfy_yield": 5.75,
+      "lfy_dividend_count": 1
     },
     {
-      "code": "601318",
-      "name": "中国平安",
-      "price": 48.58,
-      "market_cap": 8796.69248117,
-      "lfy_dividend": 2.57,
-      "lfy_yield": 5.290242898312062,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601658",
-      "name": "邮储银行",
-      "price": 4.96,
-      "market_cap": 5956.7146532,
-      "lfy_dividend": 0.2616,
-      "lfy_yield": 5.274193548387097,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "601857",
-      "name": "中国石油",
-      "price": 8.92,
-      "market_cap": 16325.47122137,
-      "lfy_dividend": 0.47000000000000003,
-      "lfy_yield": 5.269058295964126,
-      "lfy_dividend_count": 2
-    },
-    {
-      "code": "000333",
-      "name": "美的集团",
-      "price": 76.68,
-      "market_cap": 5837.98495389,
-      "lfy_dividend": 4.0,
-      "lfy_yield": 5.216484089723526,
-      "lfy_dividend_count": 2
+      "code": "600036",
+      "name": "招商银行",
+      "price": 35.80,
+      "market_cap": 15000.20,
+      "lfy_dividend": 1.43,
+      "lfy_yield": 4.00,
+      "lfy_dividend_count": 1
     }
   ],
-  "update_time": "2026-06-29 06:12:01"
+  "update_time": "2026-06-28 22:00:00"
 }
