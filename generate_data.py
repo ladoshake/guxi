@@ -5,9 +5,44 @@ from datetime import datetime, timedelta
 import json
 import logging
 import os
+import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# 配置akshare的请求参数，增加重试和超时
+def setup_akshare_retry():
+    """配置akshare的请求重试机制"""
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=5,  # 最大重试次数
+        backoff_factor=2,  # 重试间隔因子
+        status_forcelist=[429, 500, 502, 503, 504],  # 需要重试的HTTP状态码
+        allowed_methods=["GET", "POST"]
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    
+    # 设置请求头，模拟浏览器访问
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive',
+        'Referer': 'http://quote.eastmoney.com/',
+    })
+    
+    # 将配置的session应用到akshare
+    try:
+        import akshare.stock_feature.stock_hist_em as hist_em
+        hist_em.requests_session = session
+    except:
+        logger.warning("无法配置akshare的session，使用默认配置")
 
 
 def parse_dividend_per_share(description):
@@ -108,13 +143,33 @@ def calculate_lfy_dividend(dividend_df):
     return 0.0, 0
 
 
+def get_stock_data_with_retry(max_retries=3, delay=10):
+    """带重试机制的获取A股行情数据"""
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"尝试获取A股行情数据 (第 {attempt + 1}/{max_retries} 次)...")
+            spot_df = ak.stock_zh_a_spot_em()
+            if spot_df is not None and not spot_df.empty:
+                return spot_df
+        except Exception as e:
+            logger.warning(f"获取行情数据失败 (第 {attempt + 1} 次): {e}")
+            if attempt < max_retries - 1:
+                logger.info(f"等待 {delay} 秒后重试...")
+                time.sleep(delay)
+    
+    return None
+
+
 def get_stock_data():
+    # 首先配置重试机制
+    setup_akshare_retry()
+    
     logger.info("开始获取A股数据...")
 
     logger.info("获取所有A股实时行情数据...")
-    spot_df = ak.stock_zh_a_spot_em()
+    spot_df = get_stock_data_with_retry(max_retries=5, delay=15)
     if spot_df is None or spot_df.empty:
-        logger.error("获取行情数据失败")
+        logger.error("获取行情数据失败，多次重试后仍无法获取")
         return None
 
     logger.info(f"获取到 {len(spot_df)} 只股票行情")
@@ -142,10 +197,19 @@ def get_stock_data():
             if not stock_code or price <= 0:
                 continue
 
-            try:
-                dividend_df = ak.stock_dividend_cninfo(symbol=stock_code)
-            except Exception as e:
-                logger.debug(f"获取分红数据失败 {stock_code}: {e}")
+            # 对每个股票的分红数据获取也增加重试
+            dividend_df = None
+            for retry in range(3):
+                try:
+                    dividend_df = ak.stock_dividend_cninfo(symbol=stock_code)
+                    break
+                except Exception as e:
+                    if retry < 2:
+                        time.sleep(2)
+                    else:
+                        logger.debug(f"获取分红数据失败 {stock_code}: {e}")
+
+            if dividend_df is None:
                 continue
 
             ttm_dividend, ttm_count = calculate_ttm_dividend(dividend_df)

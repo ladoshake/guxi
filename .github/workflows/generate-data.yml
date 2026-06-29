@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install akshare pandas
+          pip install akshare pandas requests
 
       - name: Generate data
         run: python generate_data.py
