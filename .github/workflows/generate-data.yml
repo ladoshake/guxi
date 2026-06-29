@@ -5,9 +5,6 @@ on:
     - cron: '0 8 * * *'
     - cron: '0 20 * * *'
   workflow_dispatch:
-  push:
-    paths-ignore:
-      - 'data.json'
 
 permissions:
   contents: write
