@@ -1,21 +1,46 @@
 {
   "ttm": [
     {
+<<<<<<< HEAD
       "code": "600011",
       "name": "华能国际",
       "price": 7.59,
       "market_cap": 1191.48528595,
       "ttm_dividend": 0.67,
       "ttm_yield": 8.827404479578394,
+=======
+      "code": "601398",
+      "name": "工商银行",
+      "price": 5.23,
+      "market_cap": 22000.5,
+      "ttm_dividend": 0.3,
+      "ttm_yield": 5.74,
+      "ttm_dividend_count": 2
+    },
+    {
+      "code": "601988",
+      "name": "中国银行",
+      "price": 3.65,
+      "market_cap": 12000.8,
+      "ttm_dividend": 0.22,
+      "ttm_yield": 6.03,
+>>>>>>> af70ed66c342956a6e8e9972bdc684672139d02a
       "ttm_dividend_count": 2
     },
     {
       "code": "600036",
       "name": "招商银行",
+<<<<<<< HEAD
       "price": 35.5,
       "market_cap": 8953.04518836,
       "ttm_dividend": 3.013,
       "ttm_yield": 8.487323943661972,
+=======
+      "price": 35.8,
+      "market_cap": 15000.2,
+      "ttm_dividend": 1.52,
+      "ttm_yield": 4.24,
+>>>>>>> af70ed66c342956a6e8e9972bdc684672139d02a
       "ttm_dividend_count": 2
     },
     {
@@ -365,6 +390,7 @@
     {
       "code": "601398",
       "name": "工商银行",
+<<<<<<< HEAD
       "price": 7.07,
       "market_cap": 25197.92237619,
       "lfy_dividend": 0.4494,
@@ -396,6 +422,12 @@
       "market_cap": 1793.30494527,
       "lfy_dividend": 0.27149999999999996,
       "lfy_yield": 6.255760368663593,
+=======
+      "price": 5.23,
+      "market_cap": 22000.5,
+      "lfy_dividend": 0.28,
+      "lfy_yield": 5.35,
+>>>>>>> af70ed66c342956a6e8e9972bdc684672139d02a
       "lfy_dividend_count": 1
     },
     {
@@ -419,6 +451,7 @@
     {
       "code": "601988",
       "name": "中国银行",
+<<<<<<< HEAD
       "price": 5.72,
       "market_cap": 18430.54995576,
       "lfy_dividend": 0.3518,
@@ -478,14 +511,28 @@
       "lfy_dividend": 0.598,
       "lfy_yield": 5.950248756218905,
       "lfy_dividend_count": 2
+=======
+      "price": 3.65,
+      "market_cap": 12000.8,
+      "lfy_dividend": 0.21,
+      "lfy_yield": 5.75,
+      "lfy_dividend_count": 1
+>>>>>>> af70ed66c342956a6e8e9972bdc684672139d02a
     },
     {
       "code": "600036",
       "name": "招商银行",
+<<<<<<< HEAD
       "price": 35.5,
       "market_cap": 8953.04518836,
       "lfy_dividend": 2.0,
       "lfy_yield": 5.633802816901409,
+=======
+      "price": 35.8,
+      "market_cap": 15000.2,
+      "lfy_dividend": 1.43,
+      "lfy_yield": 4.0,
+>>>>>>> af70ed66c342956a6e8e9972bdc684672139d02a
       "lfy_dividend_count": 1
     },
     {
@@ -543,6 +590,11 @@
       "lfy_dividend_count": 2
     }
   ],
+<<<<<<< HEAD
   "update_time": "2026-06-30 23:31:19",
   "is_backup": false
+=======
+  "update_time": "2026-06-30 14:47:08",
+  "is_backup": true
+>>>>>>> af70ed66c342956a6e8e9972bdc684672139d02a
 }
