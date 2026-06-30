@@ -143,20 +143,76 @@ def calculate_lfy_dividend(dividend_df):
     return 0.0, 0
 
 
-def get_stock_data_with_retry(max_retries=3, delay=10):
-    """带重试机制的获取A股行情数据"""
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"尝试获取A股行情数据 (第 {attempt + 1}/{max_retries} 次)...")
-            spot_df = ak.stock_zh_a_spot_em()
-            if spot_df is not None and not spot_df.empty:
-                return spot_df
-        except Exception as e:
-            logger.warning(f"获取行情数据失败 (第 {attempt + 1} 次): {e}")
-            if attempt < max_retries - 1:
-                logger.info(f"等待 {delay} 秒后重试...")
-                time.sleep(delay)
+def get_stock_data_with_retry(max_retries=5, delay=20):
+    """带重试机制的获取A股行情数据，使用多个数据源"""
+    data_sources = [
+        ('东方财富', lambda: ak.stock_zh_a_spot_em()),
+        ('上海A股+深圳A股', lambda: pd.concat([ak.stock_sh_a_spot_em(), ak.stock_sz_a_spot_em()], ignore_index=True)),
+    ]
     
+    for source_name, fetch_func in data_sources:
+        logger.info(f"尝试从 {source_name} 获取行情数据...")
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"  第 {attempt + 1}/{max_retries} 次尝试...")
+                time.sleep(3)
+                
+                spot_df = fetch_func()
+                if spot_df is not None and not spot_df.empty:
+                    logger.info(f"成功从 {source_name} 获取到 {len(spot_df)} 条数据")
+                    return spot_df
+                    
+            except Exception as e:
+                logger.warning(f"  失败: {str(e)[:100]}")
+                if attempt < max_retries - 1:
+                    wait_time = delay + attempt * 5
+                    logger.info(f"  等待 {wait_time} 秒后重试...")
+                    time.sleep(wait_time)
+        
+        logger.warning(f"{source_name} 数据源失败，切换到下一个数据源")
+        time.sleep(10)
+    
+    return None
+
+
+def normalize_columns(df):
+    """统一不同数据源的列名"""
+    if df is None:
+        return None
+    
+    column_mapping = {
+        '股票代码': '代码',
+        '股票名称': '名称',
+        '最新价': '最新价',
+        '总市值': '总市值',
+        '市值': '总市值',
+    }
+    
+    df = df.rename(columns=lambda x: column_mapping.get(x, x))
+    
+    required_columns = ['代码', '名称', '最新价']
+    missing_cols = [col for col in required_columns if col not in df.columns]
+    
+    if missing_cols:
+        logger.error(f"缺少必要列: {missing_cols}，当前列名: {list(df.columns)}")
+        return None
+    
+    return df
+
+
+def load_backup_data():
+    """加载备份数据"""
+    backup_file = 'data.json'
+    if os.path.exists(backup_file):
+        try:
+            logger.info("尝试加载备份数据...")
+            with open(backup_file, 'r', encoding='utf-8') as f:
+                backup_data = json.load(f)
+                if backup_data and 'ttm' in backup_data and 'lfy' in backup_data:
+                    logger.info(f"成功加载备份数据，包含 {len(backup_data['ttm'])} 条TTM数据")
+                    return backup_data
+        except Exception as e:
+            logger.warning(f"加载备份数据失败: {e}")
     return None
 
 
@@ -167,21 +223,38 @@ def get_stock_data():
     logger.info("开始获取A股数据...")
 
     logger.info("获取所有A股实时行情数据...")
-    spot_df = get_stock_data_with_retry(max_retries=5, delay=15)
+    spot_df = get_stock_data_with_retry(max_retries=3, delay=20)
+    
     if spot_df is None or spot_df.empty:
-        logger.error("获取行情数据失败，多次重试后仍无法获取")
+        logger.error("所有数据源获取行情数据失败")
+        logger.info("尝试使用备份数据...")
+        backup_data = load_backup_data()
+        if backup_data:
+            logger.info("使用备份数据更新时间戳后返回")
+            backup_data['update_time'] = (datetime.now() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+            backup_data['is_backup'] = True
+            return backup_data
+        else:
+            logger.error("无备份数据可用，数据生成失败")
+            return None
+
+    spot_df = normalize_columns(spot_df)
+    if spot_df is None:
+        logger.error("数据列名不匹配")
         return None
 
     logger.info(f"获取到 {len(spot_df)} 只股票行情")
 
-    large_cap_stocks = spot_df[
-        (spot_df['总市值'] >= 1000 * 1e8) &
-        (spot_df['总市值'].notna())
-    ].copy()
-
-    large_cap_stocks = large_cap_stocks.sort_values('总市值', ascending=False)
-
-    logger.info(f"筛选出 {len(large_cap_stocks)} 只市值大于1000亿的股票")
+    if '总市值' in spot_df.columns and not spot_df['总市值'].isna().all():
+        large_cap_stocks = spot_df[
+            (spot_df['总市值'] >= 1000 * 1e8) &
+            (spot_df['总市值'].notna())
+        ].copy()
+        large_cap_stocks = large_cap_stocks.sort_values('总市值', ascending=False)
+        logger.info(f"筛选出 {len(large_cap_stocks)} 只市值大于1000亿的股票")
+    else:
+        logger.warning("缺少市值数据，处理前200只股票")
+        large_cap_stocks = spot_df.head(200).copy()
 
     results_ttm = []
     results_lfy = []
@@ -254,17 +327,35 @@ def get_stock_data():
     return {
         'ttm': results_ttm,
         'lfy': results_lfy,
-        'update_time': (datetime.now() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S")
+        'update_time': (datetime.now() + timedelta(hours=8)).strftime("%Y-%m-%d %H:%M:%S"),
+        'is_backup': False
     }
 
 
 if __name__ == "__main__":
-    data = get_stock_data()
-    if data:
-        output_path = os.path.join(os.path.dirname(__file__), "data.json")
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        logger.info(f"数据已保存到 {output_path}")
-        logger.info(f"TTM前30: {len(data['ttm'])}, LFY前30: {len(data['lfy'])}")
-    else:
-        logger.error("数据生成失败")
+    success = False
+    try:
+        data = get_stock_data()
+        if data:
+            output_path = os.path.join(os.path.dirname(__file__), "data.json")
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            logger.info(f"数据已保存到 {output_path}")
+            logger.info(f"TTM前30: {len(data['ttm'])}, LFY前30: {len(data['lfy'])}")
+            success = True
+        else:
+            logger.error("数据生成失败")
+    except Exception as e:
+        logger.error(f"脚本执行异常: {e}")
+        logger.info("尝试使用备份数据...")
+        backup_data = load_backup_data()
+        if backup_data:
+            output_path = os.path.join(os.path.dirname(__file__), "data.json")
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(backup_data, f, ensure_ascii=False, indent=2)
+            logger.info(f"已使用备份数据")
+            success = True
+        else:
+            logger.error("无备份数据可用")
+    finally:
+        logger.info(f"脚本执行完成 (成功: {success})")
