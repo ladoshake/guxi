@@ -4,8 +4,8 @@
       "code": "601398",
       "name": "工商银行",
       "price": 5.23,
-      "market_cap": 22000.50,
-      "ttm_dividend": 0.30,
+      "market_cap": 22000.5,
+      "ttm_dividend": 0.3,
       "ttm_yield": 5.74,
       "ttm_dividend_count": 2
     },
@@ -13,7 +13,7 @@
       "code": "601988",
       "name": "中国银行",
       "price": 3.65,
-      "market_cap": 12000.80,
+      "market_cap": 12000.8,
       "ttm_dividend": 0.22,
       "ttm_yield": 6.03,
       "ttm_dividend_count": 2
@@ -21,8 +21,8 @@
     {
       "code": "600036",
       "name": "招商银行",
-      "price": 35.80,
-      "market_cap": 15000.20,
+      "price": 35.8,
+      "market_cap": 15000.2,
       "ttm_dividend": 1.52,
       "ttm_yield": 4.24,
       "ttm_dividend_count": 2
@@ -33,7 +33,7 @@
       "code": "601398",
       "name": "工商银行",
       "price": 5.23,
-      "market_cap": 22000.50,
+      "market_cap": 22000.5,
       "lfy_dividend": 0.28,
       "lfy_yield": 5.35,
       "lfy_dividend_count": 1
@@ -42,7 +42,7 @@
       "code": "601988",
       "name": "中国银行",
       "price": 3.65,
-      "market_cap": 12000.80,
+      "market_cap": 12000.8,
       "lfy_dividend": 0.21,
       "lfy_yield": 5.75,
       "lfy_dividend_count": 1
@@ -50,12 +50,13 @@
     {
       "code": "600036",
       "name": "招商银行",
-      "price": 35.80,
-      "market_cap": 15000.20,
+      "price": 35.8,
+      "market_cap": 15000.2,
       "lfy_dividend": 1.43,
-      "lfy_yield": 4.00,
+      "lfy_yield": 4.0,
       "lfy_dividend_count": 1
     }
   ],
-  "update_time": "2026-06-28 22:00:00"
+  "update_time": "2026-06-30 14:47:08",
+  "is_backup": true
 }
