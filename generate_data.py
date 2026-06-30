@@ -2,11 +2,18 @@ import akshare as ak
 import pandas as pd
 import re
 from datetime import datetime, timedelta
-import pytz
 import json
 import logging
 import os
 import time
+
+
+def get_beijing_time():
+    """获取当前北京时间"""
+    os.environ['TZ'] = 'Asia/Shanghai'
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -232,7 +239,7 @@ def get_stock_data():
         backup_data = load_backup_data()
         if backup_data:
             logger.info("使用备份数据更新时间戳后返回")
-            backup_data['update_time'] = datetime.now(pytz.timezone('Asia/Shanghai')).strftime("%Y-%m-%d %H:%M:%S")
+            backup_data['update_time'] = get_beijing_time()
             backup_data['is_backup'] = True
             return backup_data
         else:
@@ -328,7 +335,7 @@ def get_stock_data():
     return {
         'ttm': results_ttm,
         'lfy': results_lfy,
-        'update_time': datetime.now(pytz.timezone('Asia/Shanghai')).strftime("%Y-%m-%d %H:%M:%S"),
+        'update_time': get_beijing_time(),
         'is_backup': False
     }
 
