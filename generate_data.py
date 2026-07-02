@@ -6,6 +6,9 @@ import json
 import logging
 import os
 import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 def get_beijing_time():
@@ -14,28 +17,23 @@ def get_beijing_time():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# 配置akshare的请求参数，增加重试和超时
-def setup_akshare_retry():
-    """配置akshare的请求重试机制"""
+
+def create_session():
+    """创建配置好的requests session"""
     session = requests.Session()
     retry_strategy = Retry(
-        total=5,  # 最大重试次数
-        backoff_factor=2,  # 重试间隔因子
-        status_forcelist=[429, 500, 502, 503, 504],  # 需要重试的HTTP状态码
+        total=5,
+        backoff_factor=2,
+        status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET", "POST"]
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
     
-    # 设置请求头，模拟浏览器访问
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -45,12 +43,144 @@ def setup_akshare_retry():
         'Referer': 'http://quote.eastmoney.com/',
     })
     
-    # 将配置的session应用到akshare
+    return session
+
+
+SESSION = create_session()
+
+
+def fetch_eastmoney_direct():
+    """从东方财富直接API获取A股实时行情"""
+    logger.info("  [东方财富直接API] 开始获取数据...")
+    url = 'https://push2.eastmoney.com/api/qt/clist/get'
+    params = {
+        'pn': '1',
+        'pz': '5000',
+        'po': '1',
+        'np': '1',
+        'ut': 'bd1d9ddb04089700cf9c27f6f7426281',
+        'fltt': '2',
+        'invt': '2',
+        'fid': 'f3',
+        'fs': 'm:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23',
+        'fields': 'f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152'
+    }
+    
     try:
-        import akshare.stock_feature.stock_hist_em as hist_em
-        hist_em.requests_session = session
-    except:
-        logger.warning("无法配置akshare的session，使用默认配置")
+        response = SESSION.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get('data', {}).get('diff'):
+            stocks = []
+            for item in data['data']['diff']:
+                stock = {
+                    '代码': item.get('f12', ''),
+                    '名称': item.get('f14', ''),
+                    '最新价': float(item.get('f2', 0)),
+                    '总市值': float(item.get('f20', 0))
+                }
+                stocks.append(stock)
+            
+            df = pd.DataFrame(stocks)
+            logger.info(f"  [东方财富直接API] 成功获取 {len(df)} 条数据")
+            return df
+        else:
+            logger.warning("  [东方财富直接API] 返回空数据")
+            return None
+    except Exception as e:
+        logger.warning(f"  [东方财富直接API] 失败: {str(e)[:100]}")
+        return None
+
+
+def fetch_tencent_gtimg():
+    """从腾讯GTimg获取A股实时行情（需要先获取代码列表）"""
+    logger.info("  [腾讯GTimg] 开始获取数据...")
+    
+    code_list = []
+    
+    # 方法1: 从东方财富直接API获取代码列表
+    try:
+        logger.info("  [腾讯GTimg] 尝试从东方财富直接API获取代码列表...")
+        url = 'https://push2.eastmoney.com/api/qt/clist/get'
+        params = {
+            'pn': '1',
+            'pz': '5000',
+            'po': '1',
+            'np': '1',
+            'ut': 'bd1d9ddb04089700cf9c27f6f7426281',
+            'fltt': '2',
+            'invt': '2',
+            'fid': 'f3',
+            'fs': 'm:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23',
+            'fields': 'f12,f14'
+        }
+        response = SESSION.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        
+        if data.get('data', {}).get('diff'):
+            code_list = [item.get('f12', '') for item in data['data']['diff'] if item.get('f12')]
+            logger.info(f"  [腾讯GTimg] 从东方财富直接API获取到 {len(code_list)} 个股票代码")
+    except Exception as e:
+        logger.warning(f"  [腾讯GTimg] 从东方财富直接API获取代码列表失败: {str(e)[:50]}")
+    
+    # 方法2: 如果方法1失败，尝试从akshare获取
+    if not code_list:
+        try:
+            logger.info("  [腾讯GTimg] 尝试从akshare获取代码列表...")
+            df = ak.stock_zh_a_spot_em()
+            if df is not None and not df.empty:
+                if '代码' in df.columns:
+                    code_list = df['代码'].astype(str).tolist()
+                elif '股票代码' in df.columns:
+                    code_list = df['股票代码'].astype(str).tolist()
+                logger.info(f"  [腾讯GTimg] 从akshare获取到 {len(code_list)} 个股票代码")
+        except Exception as e:
+            logger.warning(f"  [腾讯GTimg] 从akshare获取代码列表失败: {str(e)[:50]}")
+    
+    if not code_list:
+        logger.warning("  [腾讯GTimg] 无法获取股票代码列表")
+        return None
+    
+    all_stocks = []
+    batch_size = 50
+    
+    for i in range(0, len(code_list), batch_size):
+        batch = code_list[i:i+batch_size]
+        codes_str = ','.join([f"sh{code}" if code.startswith('6') else f"sz{code}" for code in batch])
+        
+        url = f'https://qt.gtimg.cn/q={codes_str}'
+        
+        try:
+            response = SESSION.get(url, timeout=10)
+            response.raise_for_status()
+            
+            lines = response.text.strip().split(';\n')
+            for line in lines:
+                if '=' in line:
+                    _, data_str = line.split('=', 1)
+                    data = data_str.strip().strip('"').split('~')
+                    if len(data) > 44:
+                        stock = {
+                            '代码': data[2],
+                            '名称': data[1],
+                            '最新价': float(data[3]) if data[3] else 0,
+                            '总市值': float(data[44]) * 1e8 if data[44] else 0
+                        }
+                        all_stocks.append(stock)
+            
+            time.sleep(0.3)
+        except Exception as e:
+            logger.warning(f"  [腾讯GTimg] 批量获取失败: {str(e)[:50]}")
+    
+    if all_stocks:
+        df = pd.DataFrame(all_stocks)
+        logger.info(f"  [腾讯GTimg] 成功获取 {len(df)} 条数据")
+        return df
+    else:
+        logger.warning("  [腾讯GTimg] 返回空数据")
+        return None
 
 
 def parse_dividend_per_share(description):
@@ -151,23 +281,33 @@ def calculate_lfy_dividend(dividend_df):
     return 0.0, 0
 
 
-def get_stock_data_with_retry(max_retries=5, delay=20):
+def get_stock_data_with_retry(max_retries=3, delay=20):
     """带重试机制的获取A股行情数据，使用多个数据源"""
+    logger.info("=" * 60)
+    logger.info("[数据获取] 开始获取股票行情数据")
+    start_time = time.time()
+    
     data_sources = [
-        ('东方财富', lambda: ak.stock_zh_a_spot_em()),
-        ('上海A股+深圳A股', lambda: pd.concat([ak.stock_sh_a_spot_em(), ak.stock_sz_a_spot_em()], ignore_index=True)),
+        ('东方财富直接API', fetch_eastmoney_direct),
+        ('腾讯GTimg', fetch_tencent_gtimg),
+        ('akshare东方财富', lambda: ak.stock_zh_a_spot_em()),
+        ('akshare上海+深圳A股', lambda: pd.concat([ak.stock_sh_a_spot_em(), ak.stock_sz_a_spot_em()], ignore_index=True)),
     ]
     
-    for source_name, fetch_func in data_sources:
-        logger.info(f"尝试从 {source_name} 获取行情数据...")
+    for source_idx, (source_name, fetch_func) in enumerate(data_sources, 1):
+        logger.info(f"[数据源{source_idx}] 尝试 {source_name}...")
+        
         for attempt in range(max_retries):
             try:
                 logger.info(f"  第 {attempt + 1}/{max_retries} 次尝试...")
-                time.sleep(3)
                 
                 spot_df = fetch_func()
                 if spot_df is not None and not spot_df.empty:
-                    logger.info(f"成功从 {source_name} 获取到 {len(spot_df)} 条数据")
+                    elapsed = time.time() - start_time
+                    logger.info(f"[数据源{source_idx}] ✅ {source_name}成功，耗时 {elapsed:.2f}s")
+                    logger.info(f"[数据源{source_idx}] 📊 返回 {len(spot_df)} 条数据")
+                    logger.info(f"[数据获取] ✅ 数据获取成功，使用数据源: {source_name}")
+                    logger.info("=" * 60)
                     return spot_df
                     
             except Exception as e:
@@ -177,9 +317,13 @@ def get_stock_data_with_retry(max_retries=5, delay=20):
                     logger.info(f"  等待 {wait_time} 秒后重试...")
                     time.sleep(wait_time)
         
-        logger.warning(f"{source_name} 数据源失败，切换到下一个数据源")
-        time.sleep(10)
+        logger.warning(f"[数据源{source_idx}] ❌ {source_name}数据源失败，切换到下一个数据源")
+        time.sleep(5)
     
+    elapsed = time.time() - start_time
+    logger.error(f"[数据获取] ❌ 所有数据源获取失败，耗时 {elapsed:.2f}s")
+    logger.error(f"[数据获取] 📋 已尝试数据源: {', '.join([s[0] for s in data_sources])}")
+    logger.info("=" * 60)
     return None
 
 
@@ -225,9 +369,6 @@ def load_backup_data():
 
 
 def get_stock_data():
-    # 首先配置重试机制
-    setup_akshare_retry()
-    
     logger.info("开始获取A股数据...")
 
     logger.info("获取所有A股实时行情数据...")
